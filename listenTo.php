@@ -176,72 +176,78 @@ function unset_listenTo_options () {
       if(get_option("listenTo_display") == "true") {
       $defaultDisplay = 'checked="checked"';
       } else { $defaultDisplay = ''; }
+      
       echo '
- <form method="post">
- <fieldset class="options">
-      <p>
-      <label>';
-      _e('Your Last.fm Username', $listenTo_domain);
-      echo '
-      </label>
-      <br />
-      <input type="text" name="listenTo_username" value="'.$defaultUsername.' " size="60" />
-      </p>
-      <p>
-      <label>';
+ <form method="post" action="">
+ <table class="form-table">
+ 	<tr valign="top">
+ 	<th scope="row">';
+    _e('Your Last.fm Username', $listenTo_domain);
+    echo '
+    </th>
+	<td>
+	<input type="text" name="listenTo_username" value="'.$defaultUsername.' " size="60" />
+    </td>
+    </tr>
+    <tr valign="top">
+    <th scope="row">';
       	_e('Display this when there is no link to display', $listenTo_domain);
       echo '
-      </label>
-      <br />
+      </th>
+      <td>
       <input type="text" name="listenTo_noLink" value="'.$defaultnoLink.' " size="60" />
-      </p>
-      <p>
-      <label>';
+      </td>
+      </tr>
+      <tr valign="top">
+      <th scope="row">';
       _e('The Link Title (displayed on mouseover)', $listenTo_domain);
       echo '
-      </label>
-      <br />
+      </th>
+      <td>
       <input type="text" name="listenTo_title" value="'.$defaultTitle.' " size="60" />
-      </p>
-      <p>
-      <label>';
+      </td>
+      </tr>
+      <tr valign="top">
+      <th scope="row" colspan="2" class="th-full">
+      <label for="listenTo_display">
+      <input type="checkbox" name="listenTo_display" id="listenTo_display" value="true" ' . $defaultDisplay . ' />&nbsp;';
       _e('Display Listen To after every post(if not you need to place " listenTo(); " in yout template)?', $listenTo_domain);
       echo '
       </label>
-      &nbsp;
-      <input type="checkbox" name="listenTo_display" value="true" ' . $defaultDisplay . ' />
-      </p>
- </fieldset>
+      </th>
+      </tr>
+      </table>
+	  <p class="submit">
       <input type="submit" name="submit" value="'; _e('Update Settings', $listenTo_domain); echo '" class="button" />
+      </p>
  </form>
- <br />
- <form method="post">
- <p>
- <label><strong>';
+
+ <form method="post" action="">
+
+ <h3>';
       _e('Delete Database Table', $listenTo_domain);
       echo '
-      </strong></label>
-      </p>
-      </p>';
+      </h3><p>';
       _e('You can delete the database entry here if you do not wish to use this plugin anymore.', $listenTo_domain);
       echo '
       </p>
-      <p>
- <input type="hidden" name="listenTo_delete" value="listenTo_delete" />
- <input type="submit" name="submit_delete" value="'; _e('Delete DB Table', $listenTo_domain); echo '" 
- onClick="javascript: var ans = confirm(\'';_e('Are you shure you want to delete the database table? Press OK for yes and Cancel if you dont want to do this.', $listenTo_domain); echo '\'); if(!ans) {return false}" class="button delete" />
- </p>
+      <p class="submit">
+ 		<input type="hidden" name="listenTo_delete" value="listenTo_delete" />
+ 		<input type="submit" name="submit_delete" value="'; _e('Delete DB Table', $listenTo_domain); echo '" 
+ 		onclick="javascript: var ans = confirm(\'';_e('Are you shure you want to delete the database table? Press OK for yes and Cancel if you dont want to do this.', $listenTo_domain); echo '\'); if(!ans) {return false}" class="button delete" />
+ 	</p>
  </form>';
 
  }
 function listenTo_options () {
 global $listenTo_domain;
-     echo '<div class="wrap"><h2>'; _e('Listen To Options', $listenTo_domain); echo '</h2>';
+    
      if ($_REQUEST['submit']) {
           update_listenTo_options();
      }elseif ($_REQUEST['submit_delete']) {
      	delete_listenTo_DB();
      }
+      echo '<div class="wrap"><h2>'; _e('Listen To Options', $listenTo_domain); echo '</h2>';
      print_listenTo_form();
      echo '</div>';
 }
