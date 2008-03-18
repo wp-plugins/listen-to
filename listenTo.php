@@ -51,8 +51,8 @@ function listenTo_lang_setup()
    if($listenTo_is_setup) {
       return;
    } 
-
-   load_plugin_textdomain($listenTo_domain, 'wp-content/plugins/listenTo');
+   
+  load_plugin_textdomain($listenTo_domain, 'wp-content/plugins/listen-to');
 }
 listenTo_lang_setup();
 
@@ -66,9 +66,9 @@ function listenTo ($before = '', $beforeLink = '', $after = '', $afterLink = '')
 	$content = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = ".$post->ID."", ARRAY_A );
 
 if($content[id]) {
-		echo $before."<span class='listenTo'>".$beforeLink."<a href='" . $content[url] . "' title='".$title." - ".$content[title]."' class='listenTo_link'>" . $content[title] . "</a>".$afterLink."</span>".$after;
+		echo $before."<span class=\"listenTo\">".$beforeLink."<a href=\"" . $content[url] . "\" title=\"".$title." - ".$content[title]."\" class=\"listenTo_link\">" . $content[title] . "</a>".$afterLink."</span>".$after;
 	} elseif($noLink) {
-		echo $before."<span class='listenTo listenTo_noLink'>".$noLink."</span>".$after;
+		echo $before."<span class=\"listenTo listenTo_noLink\">".$noLink."</span>".$after;
 	}else {
 		
 	}
@@ -127,7 +127,7 @@ function listenTo_publish ($id) {
 /*insert into post*/
 
 function listenTo_post($content) {
-	if (get_option('listenTo_display') == 'checked') {
+	if (get_option('listenTo_display') == 'true') {
 		print $content.'<p>';
 		listenTo();
 		print '</p>';
@@ -172,7 +172,9 @@ function unset_listenTo_options () {
       $defaultUsername = get_option('listenTo_username');
       $defaultnoLink = get_option('listenTo_noLink');
       $defaultTitle = get_option('listenTo_title');
-      $defaultDisplay = get_option('listenTo_display');
+      if(get_option("listenTo_display") == "true") {
+      $defaultDisplay = 'checked="checked"';
+      } else { $defaultDisplay = ''; }
       echo '
  <form method="post">
  <fieldset class="options">
@@ -206,7 +208,7 @@ function unset_listenTo_options () {
       echo '
       </label>
       &nbsp;
-      <input type="checkbox" name="listenTo_display" value="checked" ' . ($defaultDisplay) . ' />
+      <input type="checkbox" name="listenTo_display" value="true" ' . $defaultDisplay . ' />
       </p>
  </fieldset>
       <input type="submit" name="submit" value="'; _e('Update Settings', $listenTo_domain); echo '" class="button" />

@@ -1,6 +1,6 @@
 === Plugin Name ===
 Contributors: eelay
-Donate link: http://www.herr-nilsson.com
+Donate link: http://www.herr-nilsson.com/listen-to
 Tags: music, last.fm
 Requires at least: 2.0.1
 Tested up to: 2.3.2
