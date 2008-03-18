@@ -3,8 +3,8 @@ Contributors: eelay
 Donate link: http://www.herr-nilsson.com/listen-to
 Tags: music, last.fm
 Requires at least: 2.0.1
-Tested up to: 2.3.2
-Stable tag:1.01
+Tested up to: 2.5
+Stable tag:1.02
 
 This plugin will display the latest song you scrobbled trough Last.fm while writing a post.
 
