@@ -35,7 +35,8 @@
  *
  */
 
-define('MAGPIE_CACHE_AGE', 120); 
+define('MAGPIE_CACHE_AGE', 120);
+//define('MAGPIE_DEBUG',1);
 global $listenTo_db_version, $dB_name;
 $listenTo_db_version = "1.0";
 $dB_name = "listenTo";
@@ -53,7 +54,7 @@ function listenTo_lang_setup()
       return;
    } 
    
-  load_plugin_textdomain($listenTo_domain, 'wp-content/plugins/listen-to');
+  load_plugin_textdomain($listenTo_domain, 'wp-content/plugins/listen-to/languages');
 }
 listenTo_lang_setup();
 
@@ -103,13 +104,21 @@ register_activation_hook(__FILE__,'listenTo_install');
 /*Insert latest into db*/
 function listenTo_publish ($id) {
 	global $wpdb, $dB_name, $username;
+		$table_name = $wpdb->prefix . $dB_name;
 		include_once(ABSPATH . WPINC . '/rss.php');
- 		$table_name = $wpdb->prefix . $dB_name;
-
-		$songs = fetch_rss('http://ws.audioscrobbler.com/1.0/user/'.$username.'/recenttracks.rss');
+		
+		$username = trim($username);
+		$url = 'http://ws.audioscrobbler.com/1.0/user/'.$username.'/recenttracks.rss';
+		$songs = fetch_rss($url);
+		if(!is_array($songs->items)) {
+			return false;
+		}
 		$songs = array_slice($songs->items, 0, 1);
 		
-		if(strtotime($songs[0]['pubdate']) + (10 * 60) >= time()) {
+		/*Write to DB*/
+		if(strtotime($songs[0]['pubdate']) + (10 * 60) >= time()
+		&&
+		!listenTo_idExist($id)) {
 			foreach ( $songs as $song ) {
 					$msg = $song['title'];
 					$updated = $song['pubdate'];
@@ -122,7 +131,38 @@ function listenTo_publish ($id) {
      						 $results = $wpdb->query( $insert );
 					}
 				}
+				/* Update post if selected*/
+				else if(
+				strtotime($songs[0]['pubdate']) + (10 * 60) >= time()
+				&&
+				get_option("listenTo_update") == "true"
+				&&
+				listenTo_idExist($id)) {
+			
+			foreach ( $songs as $song ) {
+					$msg = $song['title'];
+					$updated = $song['pubdate'];
+					$link = $song['link'];
+					
+			$wpdb->query("UPDATE " . $table_name . " SET time = '" . $wpdb->escape($updated) . "', title = '" . $wpdb->escape($msg) . "', url = '" . $wpdb->escape($link) . "' WHERE id = '" . $id . "' ");
+					
+					}
+				}
 
+}
+
+/*check if id exist*/
+
+function listenTo_idExist($id) {
+	global $wpdb, $dB_name;
+	
+	$table_name = $wpdb->prefix . $dB_name;
+	$check = $wpdb->get_row("SELECT id FROM ".$table_name." WHERE id = ".$id."", ARRAY_A );
+	if(isset($check)) { 
+		return true;
+	 } else {
+	 	return false;
+	 }
 }
 
 /*insert into post*/
@@ -137,7 +177,6 @@ function listenTo_post($content) {
 		return $content;
 	}
 }
-
 
 /*Delete post - remove entry*/
 
@@ -161,12 +200,14 @@ function set_listenTo_options () {
      add_option("listenTo_noLink", "");
      add_option("listenTo_title","When I wrote this post I was listening to");
      add_option("listenTo_display","");
+     add_option("listenTo_update","");
 }
 function unset_listenTo_options () {
      delete_option("listenTo_username");
      delete_option("listenTo_noLink");
      delete_option("listenTo_title");
      delete_option("listenTo_display");
+     delete_option("listenTo_update");
 }
  function print_listenTo_form () {
  global $listenTo_domain;
@@ -175,7 +216,10 @@ function unset_listenTo_options () {
       $defaultTitle = get_option('listenTo_title');
       if(get_option("listenTo_display") == "true") {
       $defaultDisplay = 'checked="checked"';
-      } else { $defaultDisplay = ''; }
+      } else { $defaultDisplay = ''; }     
+      if(get_option("listenTo_update") == "true") {
+      $defaultUpdate = 'checked="checked"';
+      } else { $defaultUpdate = ''; }
       
       echo '
  <form method="post" action="">
@@ -206,6 +250,15 @@ function unset_listenTo_options () {
       <td>
       <input type="text" name="listenTo_title" value="'.$defaultTitle.' " size="60" />
       </td>
+      </tr>
+       <tr valign="top">
+      <th scope="row" colspan="2" class="th-full">
+      <label for="listenTo_update">
+      <input type="checkbox" name="listenTo_update" id="listenTo_update" value="true" ' . $defaultUpdate . ' />&nbsp;';
+      _e('Update Listen To for the post when you update a post?', $listenTo_domain);
+      echo '
+      </label>
+      </th>
       </tr>
       <tr valign="top">
       <th scope="row" colspan="2" class="th-full">
@@ -304,6 +357,12 @@ global $listenTo_domain;
           $updated = true;
      } else {
      	update_option('listenTo_display', '');
+     }
+     if ($_REQUEST['listenTo_update']) {
+          update_option('listenTo_update', $_REQUEST['listenTo_update']);
+          $updated = true;
+     } else {
+     	update_option('listenTo_update', '');
      }
      if ($updated) {
            echo '<div id="message" class="updated fade">';
