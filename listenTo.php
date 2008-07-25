@@ -4,7 +4,7 @@
  * Plugin Name: Listen To
  * Plugin URI: http://www.herr-nilsson.com/listen-to
  * Description: This plugin will display the latest song you scrobbled trough Last.fm while writing a post. You can place it where you want in you template. <a href="options-general.php?page=listenTo/listenTo.php">Configure your settings here</a>.
- * Version: 1.02
+ * Version: 1.03
  * Author: Alexander Lian
  * Author URI: http://Herr-Nilsson.com
  *
