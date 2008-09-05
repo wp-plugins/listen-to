@@ -4,7 +4,7 @@
  * Plugin Name: Listen To
  * Plugin URI: http://www.herr-nilsson.com/listen-to
  * Description: This plugin will display the latest song you scrobbled trough Last.fm while writing a post. You can place it where you want in you template. <a href="options-general.php?page=listenTo/listenTo.php">Configure your settings here</a>.
- * Version: 1.03
+ * Version: 1.04
  * Author: Alexander Lian
  * Author URI: http://Herr-Nilsson.com
  *
@@ -120,7 +120,7 @@ function listenTo_publish ($id) {
 		&&
 		!listenTo_idExist($id)) {
 			foreach ( $songs as $song ) {
-					$msg = $song['title'];
+					$msg = htmlspecialchars($song['title']);
 					$updated = $song['pubdate'];
 					$link = $song['link'];
 					
@@ -140,7 +140,7 @@ function listenTo_publish ($id) {
 				listenTo_idExist($id)) {
 			
 			foreach ( $songs as $song ) {
-					$msg = $song['title'];
+					$msg = htmlspecialchars($song['title']);
 					$updated = $song['pubdate'];
 					$link = $song['link'];
 					
